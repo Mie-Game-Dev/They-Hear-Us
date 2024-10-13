@@ -46,11 +46,11 @@ Light:
   m_Color: {r: 1, g: 0.8950032, b: 0, a: 1}
   m_Intensity: 4.5
   m_Range: 14
-  m_SpotAngle: 63.4
-  m_InnerSpotAngle: 20.8
+  m_SpotAngle: 65
+  m_InnerSpotAngle: 6
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 0
+    m_Type: 2
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1
@@ -285,9 +285,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c8c92e8943a9914ba89720ba5fcf806, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ViewRadius: 15
+  ViewRadius: 12
   AdditionalSoftenDistance: 0
-  ViewAngle: 360
+  ViewAngle: 50
   UnobscuredRadius: 1
   AddCorners: 0
   RevealHiderInFadeOutZonePercentage: 0.5
@@ -297,7 +297,7 @@ MonoBehaviour:
   ObstacleMask:
     serializedVersion: 2
     m_Bits: 64
-  RaycastResolution: 0.5
+  RaycastResolution: 0.3
   MaxEdgeResolveIterations: 10
   NumExtraIterations: 3
   NumExtraRaysOnIteration: 4
