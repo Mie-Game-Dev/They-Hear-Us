@@ -85,11 +85,11 @@ public class PlayerInputController : MonoBehaviour
     {
         animator.SetTrigger("Shoot");
 
-        GameObject bullet = Instantiate(bulletPrefab, bulletSpawnPoint.position, Quaternion.identity);
+        GameObject bullet = Instantiate(bulletPrefab, bulletSpawnPoint.position, bulletSpawnPoint.rotation);
         Bullet bulletScript = bullet.GetComponent<Bullet>();
         if (bulletScript != null)
         {
-            bulletScript.SetTarget(target);
+           // bulletScript.SetTarget(target);
         }
     }
 

@@ -11,7 +11,6 @@ namespace FOW
         public GameObject[] ObjectsToHideInLayer;
         public Image[] ImagesToHide;
         public CanvasGroup[] CanvasGroup;
-        public GameObject eyeVisibilityIcon;
 
         // New variables for handling layers using LayerMask
         public LayerMask defaultLayer;
@@ -41,11 +40,6 @@ namespace FOW
                     SetLayerRecursively(o, LayerMaskToLayer(hiddenLayer));
                 }
             }
-
-            if (eyeVisibilityIcon != null)
-            {
-                eyeVisibilityIcon.SetActive(true);
-            }
         }
 
         protected override void OnReveal()
@@ -71,11 +65,6 @@ namespace FOW
                 {
                     SetLayerRecursively(o, LayerMaskToLayer(defaultLayer));
                 }
-            }
-
-            if (eyeVisibilityIcon != null)
-            {
-                eyeVisibilityIcon.SetActive(false);
             }
         }
 

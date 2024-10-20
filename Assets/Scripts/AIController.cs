@@ -3,25 +3,28 @@ using UnityEngine.AI;
 
 public class AIController : MonoBehaviour
 {
-    public Transform[] patrolPoints;        // Array of patrol points for AI to move between
-    public Transform target;                // Target destination for AI (e.g., the player)
-    public float detectionRadius = 10f;     // Radius to detect the player
-    public float stoppingDistance = 1f;     // Distance to stop when near the target
-    public LayerMask targetMask;            // Layer mask for target detection
-    public bool isChasing = false;          // Boolean to check if AI is chasing target
+    public DynamicSensor sensor;           // Reference to the DynamicSensor component
+    public Transform[] waypoints;          // List of waypoints for patrolling
+    public float stoppingDistance = 1f;    // Distance to stop when near the target
+    public float patrolWaitTime = 2f;      // Time to wait at each waypoint
+    public bool isChasing = false;         // Boolean to check if AI is chasing a target
 
-    private NavMeshAgent agent;             // Reference to the AI's NavMeshAgent
-    private int currentPatrolIndex;         // Current patrol point index
+    private NavMeshAgent agent;            // Reference to the AI's NavMeshAgent
+    private Transform target;              // Current target (detected dynamically by sensor)
+    private int currentWaypointIndex = 0;  // Current waypoint index for patrolling
+    private bool waitingAtWaypoint = false;// Boolean to check if AI is waiting at a waypoint
+    private float patrolWaitTimer;         // Timer for waiting at waypoints
 
     private void Start()
     {
         agent = GetComponent<NavMeshAgent>();
-        StartPatrolling();                  // Start the AI patrolling by default
+        patrolWaitTimer = patrolWaitTime;
+        StartPatrolling();  // Start AI patrolling behavior
     }
 
     private void Update()
     {
-        if (isChasing)
+        if (isChasing && target != null)
         {
             ChaseTarget();
         }
@@ -29,66 +32,97 @@ public class AIController : MonoBehaviour
         {
             Patrol();
         }
-        CheckForTarget();
+
+        CheckForTarget();  // Continually check for enemies during patrol or chase
     }
 
-    // Patrol between points
-    private void Patrol()
-    {
-        if (agent.remainingDistance <= agent.stoppingDistance)
-        {
-            currentPatrolIndex = (currentPatrolIndex + 1) % patrolPoints.Length;
-            agent.SetDestination(patrolPoints[currentPatrolIndex].position);
-        }
-    }
-
-    // Chase the player or a target
-    private void ChaseTarget()
-    {
-        if (target != null)
-        {
-            agent.SetDestination(target.position);
-
-            // Stop chasing if close enough
-            if (agent.remainingDistance <= stoppingDistance)
-            {
-                agent.isStopped = true;
-            }
-            else
-            {
-                agent.isStopped = false;
-            }
-        }
-    }
-
-    // Check if a target is within detection range
+    // Use the sensor to check for nearby targets
     private void CheckForTarget()
     {
-        Collider[] targetsInView = Physics.OverlapSphere(transform.position, detectionRadius, targetMask);
+        Collider[] detectedTargets = sensor.Detect();
 
-        if (targetsInView.Length > 0)
+        if (detectedTargets.Length > 0)
         {
-            Transform detectedTarget = targetsInView[0].transform;
-            target = detectedTarget;
-            isChasing = true;  // Switch to chase mode if a target is detected
+            target = detectedTargets[0].transform;  // Take the first detected target
+            isChasing = true;  // Switch to chase mode
         }
         else
         {
-            isChasing = false;  // Continue patrolling if no target is detected
+            // If no targets are detected, stop chasing and resume patrolling
+            target = null;
+            isChasing = false;
         }
     }
 
-    // Start patrolling
-    private void StartPatrolling()
+    // Chase the detected target
+    private void ChaseTarget()
     {
-        currentPatrolIndex = 0;
-        agent.SetDestination(patrolPoints[currentPatrolIndex].position);
+        if (target == null)
+        {
+            // If target is null, stop and return to patrol
+            isChasing = false;
+            return;
+        }
+
+        agent.SetDestination(target.position);
+
+        if (agent.remainingDistance <= stoppingDistance)
+        {
+            agent.isStopped = true;  // Stop moving if close enough
+        }
+        else
+        {
+            agent.isStopped = false;
+        }
     }
 
-    // Visualize the detection radius in the editor
+    // Patrol between waypoints
+    private void Patrol()
+    {
+        if (waitingAtWaypoint)  // If waiting at the current waypoint
+        {
+            patrolWaitTimer -= Time.deltaTime;
+
+            if (patrolWaitTimer <= 0f)
+            {
+                waitingAtWaypoint = false;
+                patrolWaitTimer = patrolWaitTime;
+                MoveToNextWaypoint();
+            }
+        }
+        else if (agent.remainingDistance <= agent.stoppingDistance)  // Reached a waypoint
+        {
+            waitingAtWaypoint = true;
+            agent.isStopped = true;
+        }
+    }
+
+    // Move to the next waypoint
+    private void MoveToNextWaypoint()
+    {
+        if (waypoints.Length == 0) return;
+
+        currentWaypointIndex = (currentWaypointIndex + 1) % waypoints.Length;  // Loop waypoints
+        agent.SetDestination(waypoints[currentWaypointIndex].position);
+        agent.isStopped = false;
+    }
+
+    // Start patrolling by moving to the first waypoint
+    private void StartPatrolling()
+    {
+        if (waypoints.Length > 0)
+        {
+            agent.SetDestination(waypoints[currentWaypointIndex].position);
+        }
+    }
+
+    // Visualize the AI detection in the editor
     private void OnDrawGizmosSelected()
     {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, detectionRadius);
+        if (sensor != null)
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(transform.position, sensor.detectionRadius);
+        }
     }
 }

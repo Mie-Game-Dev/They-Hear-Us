@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7631266461969246754}
   - component: {fileID: 3616094533370263827}
+  - component: {fileID: 8709377482305122834}
   m_Layer: 0
   m_Name: Bullet
   m_TagString: Untagged
@@ -44,5 +45,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b52fa01be79b2744fbc0a3a137960adb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 20
-  lifeTime: 2
+  sensor: {fileID: 8709377482305122834}
+  bulletSpeed: 10
+  damage: 10
+  maxBounds: {x: 50, y: 0, z: 50}
+  minBounds: {x: -50, y: 0, z: -50}
+  detectedEnemies: []
+--- !u!114 &8709377482305122834
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 81593432652286501}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68c279185e173ac4fb0d96e1f885d39c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  detectionMode: 1
+  targetTag: Enemy
+  targetLayer:
+    serializedVersion: 2
+    m_Bits: 256
+  detectionRadius: 0.5
+  detectedObjects: []
