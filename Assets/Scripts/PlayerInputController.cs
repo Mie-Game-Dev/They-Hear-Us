@@ -8,6 +8,8 @@ public class PlayerInputController : MonoBehaviour
     public Camera mainCamera;
     public LayerMask groundLayer;
     public GameObject bulletPrefab;
+    public GameObject muzzlePrefab;
+    public GameObject muzzlePosition;
     public Transform bulletSpawnPoint;
     public Animator animator;  // Reference to the Animator component
 
@@ -87,6 +89,7 @@ public class PlayerInputController : MonoBehaviour
 
         GameObject bullet = Instantiate(bulletPrefab, bulletSpawnPoint.position, bulletSpawnPoint.rotation);
         Bullet bulletScript = bullet.GetComponent<Bullet>();
+        var flash = Instantiate(muzzlePrefab, muzzlePosition.transform);
         if (bulletScript != null)
         {
            // bulletScript.SetTarget(target);
